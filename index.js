@@ -1,6 +1,7 @@
 const express=require('express')
 const cors=require('cors')
 require('dotenv').config()
+const bcrypt = require('bcryptjs');
 const app=express()
 const port=process.env.PORT || 5000
 
@@ -29,6 +30,28 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    const userCollection=client.db('3wCompany').collection('user')
+
+
+app.post('/users' ,async(req,res) =>{
+  const user=req.body
+  const username=user.username
+  const email=user.email
+  const password=user.password
+  const pass=bcrypt.hashSync(password ,10)
+  const userData={
+    username ,
+    email,
+    pass
+  }
+  const result=await userCollection.insertOne(userData)
+  console.log(result)
+  res.send(result)
+})
+  
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
